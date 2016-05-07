@@ -5,6 +5,7 @@ package com.cedarbarkgrooming.ui;
  */
 public class HomePresenter {
 
-
-
+    public void onNavigateClick() {
+        // todo: navigate to Cedar Bark grooming
+    }
 }

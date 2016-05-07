@@ -10,8 +10,8 @@ import com.cedarbarkgrooming.R;
 
 import javax.inject.Inject;
 
+import butterknife.ButterKnife;
 import butterknife.OnClick;
-import butterknife.OnTouch;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
@@ -26,11 +26,10 @@ public class HomeActivity extends BaseActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        ButterKnife.bind(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        Log.d(TAG, "onCreate called");
     }
 
     @Override
@@ -60,14 +59,8 @@ public class HomeActivity extends BaseActivity {
     }
 
     @OnClick(R.id.fab_navigate)
-    private void onNavigateClicked() {
-        // todo: navigate to Cedar Bark grooming
-        Log.d(TAG, "FAB has been tapped");
-    }
-
-    @OnTouch(R.id.fab_navigate)
-    private void onFabTouched() {
-        Log.e(TAG, "FAB got TOUCHED ahmagaad");
+    public void onNavigateClicked() {
+        mHomePresenter.onNavigateClick();
     }
 
 }
