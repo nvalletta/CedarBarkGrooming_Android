@@ -18,4 +18,7 @@
     <string name="text_reminders">Would you like to schedule an appointment? Tap here to create and manage your appointment reminders!</string>
     <string name="text_create_a_new_reminder">Create a New Reminder</string>
     <string name="text_reminder_description">Need a reminder to help you remember when you next appointment should be? We\'ve got you covered!</string>
+    <string name="text_add_reminder">Add a Reminder</string>
+    <string name="text_edit_reminder_description">Just enter the purpose of your reminder and the date you\'d like to be reminded on, and you\'re all set!</string>
+    <string name="text_done">All finished? Click here!</string>
 </resources>

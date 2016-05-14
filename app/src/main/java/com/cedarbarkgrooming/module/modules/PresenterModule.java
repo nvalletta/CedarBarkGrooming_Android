@@ -1,6 +1,7 @@
 package com.cedarbarkgrooming.module.modules;
 
 import com.cedarbarkgrooming.ui.home.HomePresenter;
+import com.cedarbarkgrooming.ui.reminders.CreateReminderPresenter;
 import com.cedarbarkgrooming.ui.reminders.RemindersPresenter;
 
 import javax.inject.Singleton;
@@ -24,6 +25,12 @@ public class PresenterModule {
     @Singleton
     RemindersPresenter providesRemindersPresenter() {
         return new RemindersPresenter();
+    }
+
+    @Provides
+    @Singleton
+    CreateReminderPresenter providesCreateReminderPresenter() {
+        return new CreateReminderPresenter();
     }
 
 }

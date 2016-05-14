@@ -5,6 +5,7 @@ import android.content.res.TypedArray;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -40,10 +41,19 @@ public class DescriptionGroup extends RelativeLayout {
         ButterKnife.bind(this);
         TypedArray typedArray = context.getTheme().obtainStyledAttributes(attrs, R.styleable.DescriptionGroup, 0, 0);
         try {
-            mTextViewDescription.setText(typedArray.getText(R.styleable.DescriptionGroup_description));
-            mButtonDescription.setText(typedArray.getText(R.styleable.DescriptionGroup_actionText));
+            populateViews(typedArray);
         } finally {
             typedArray.recycle();
+        }
+    }
+
+    private void populateViews(TypedArray typedArray) {
+        mTextViewDescription.setText(typedArray.getText(R.styleable.DescriptionGroup_description));
+        CharSequence buttonText = typedArray.getText(R.styleable.DescriptionGroup_actionText);
+        if (null == buttonText || buttonText.equals("")) {
+            mButtonDescription.setVisibility(View.GONE);
+        } else {
+            mButtonDescription.setText(buttonText);
         }
     }
 

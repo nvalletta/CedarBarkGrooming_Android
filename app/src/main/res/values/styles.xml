@@ -34,4 +34,8 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="ClickableTextLarge" parent="ClickableText">
+        <item name="android:textSize">20sp</item>
+    </style>
+
 </resources>

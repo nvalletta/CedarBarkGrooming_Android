@@ -1,15 +1,21 @@
 package com.cedarbarkgrooming.ui.reminders;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.cedarbarkgrooming.R;
+import com.cedarbarkgrooming.model.Reminder;
 import com.cedarbarkgrooming.ui.BaseActivity;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import butterknife.OnClick;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
@@ -18,11 +24,18 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
  */
 public class RemindersActivity extends BaseActivity {
 
+    public static final String RESULT_REMINDER = "createNewReminderResult";
+
     @Inject
     RemindersPresenter mRemindersPresenter;
 
+    @Inject
+    List<Reminder> mReminders;
+
     @BindView(R.id.recycler_reminders)
     RecyclerView mRecyclerReminders;
+
+    ReminderAdapter mReminderAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +45,21 @@ public class RemindersActivity extends BaseActivity {
 
         // todo: kick off content provider and loader stuff
 
-        mRecyclerReminders.setAdapter(new ReminderAdapter());
+        mReminderAdapter = new ReminderAdapter();
+        mRecyclerReminders.setLayoutManager(new LinearLayoutManager(this));
+        mRecyclerReminders.setAdapter(mReminderAdapter);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        mRemindersPresenter.setRemindersChangeListener(null);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mRemindersPresenter.setRemindersChangeListener(() -> mReminderAdapter.notifyDataSetChanged());
     }
 
     @Override
@@ -40,6 +67,15 @@ public class RemindersActivity extends BaseActivity {
         getInjector().inject(this);
     }
 
+    @OnClick(R.id.button_description)
+    public void onCreateNewReminderClick() {
+        startActivityForResult(new Intent(this, CreateReminderActivity.class), RESULT_OK);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        mReminderAdapter.notifyDataSetChanged();
+    }
 
 }

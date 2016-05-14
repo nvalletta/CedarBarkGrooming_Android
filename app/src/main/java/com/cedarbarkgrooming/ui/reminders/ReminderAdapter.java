@@ -1,16 +1,16 @@
 package com.cedarbarkgrooming.ui.reminders;
 
 import android.support.v7.widget.RecyclerView;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.model.Reminder;
 
 import java.util.List;
 
 import javax.inject.Inject;
+
+import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
 /**
  * Created by Nora on 5/14/2016.
@@ -30,6 +30,10 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     @Inject
     List<Reminder> mReminders;
 
+    public ReminderAdapter() {
+        getInjector().inject(this);
+    }
+
     @Override
     public int getItemCount() {
         return mReminders.size();
@@ -37,14 +41,13 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_reminder, parent);
-        return new ViewHolder((ReminderItem)view);
+        View view = new ReminderItem(parent.getContext());
+        return new ReminderAdapter.ViewHolder((ReminderItem)view);
     }
 
     @Override
     public void onBindViewHolder(ReminderAdapter.ViewHolder holder, int position) {
-        Reminder reminder = mReminders.get(position);
-        holder.mReminderItem.setTitle(reminder.getTitle());
-        holder.mReminderItem.setDate(reminder.getDate());
+        holder.mReminderItem.setReminder(mReminders.get(position));
     }
+
 }
