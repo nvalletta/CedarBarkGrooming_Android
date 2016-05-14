@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="@dimen/text_margin">
+
+    <TextView
+        android:id="@+id/text_reminder_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/colorAccent"
+        android:textSize="@dimen/text_title_size"
+        android:layout_marginBottom="@dimen/text_spacing_small"
+        tools:text="Reminder"/>
+
+    <TextView
+        android:id="@+id/text_reminder_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_reminder_title"
+        tools:text="July 12th, 2018"/>
+
+    <Button
+        android:id="@+id/button_delete"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:drawableStart="@drawable/ic_delete_black_36dp"/>
+    
+</RelativeLayout>

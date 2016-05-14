@@ -1,12 +1,14 @@
-package com.cedarbarkgrooming.ui;
+package com.cedarbarkgrooming.ui.home;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.cedarbarkgrooming.R;
+import com.cedarbarkgrooming.ui.BaseActivity;
+import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 
 import javax.inject.Inject;
 
@@ -16,8 +18,6 @@ import butterknife.OnClick;
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
 public class HomeActivity extends BaseActivity {
-
-    private static final String TAG = "HomeActivity";
 
     @Inject
     HomePresenter mHomePresenter;
@@ -39,19 +39,14 @@ public class HomeActivity extends BaseActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_home, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
             return true;
         }
@@ -61,6 +56,17 @@ public class HomeActivity extends BaseActivity {
     @OnClick(R.id.fab_navigate)
     public void onNavigateClicked() {
         mHomePresenter.onNavigateClick();
+    }
+
+    @OnClick(R.id.button_description)
+    public void onViewGalleryClicked() {
+        mHomePresenter.onViewImageGalleryClick();
+    }
+
+    @OnClick(R.id.layout_reminders)
+    public void onManageRemindersClicked() {
+        mHomePresenter.onManageRemindersClick();
+        startActivity(new Intent(this, RemindersActivity.class));
     }
 
 }

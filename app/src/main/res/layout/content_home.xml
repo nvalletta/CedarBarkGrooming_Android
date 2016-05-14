@@ -5,13 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context=".ui.HomeActivity"
+    tools:context=".ui.home.HomeActivity"
     tools:showIn="@layout/activity_home">
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <TextView
-        android:layout_width="wrap_content"
+    <com.cedarbarkgrooming.ui.custom.DescriptionGroup
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="@dimen/text_margin"
-        android:text="@string/large_text" />
+        app:description="@string/description_text"
+        app:actionText="@string/text_view_image_gallery" />
 
+    <include layout="@layout/item_view_reminders"/>
+
+    </LinearLayout>
 </android.support.v4.widget.NestedScrollView>

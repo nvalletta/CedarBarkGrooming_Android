@@ -1,6 +1,7 @@
 package com.cedarbarkgrooming.module;
 
 import com.cedarbarkgrooming.module.modules.ApplicationModule;
+import com.cedarbarkgrooming.module.modules.ObjectModule;
 import com.cedarbarkgrooming.module.modules.PresenterModule;
 
 import javax.inject.Singleton;
@@ -14,7 +15,8 @@ import dagger.Component;
 @Component(
         modules = {
                 ApplicationModule.class,
-                PresenterModule.class
+                PresenterModule.class,
+                ObjectModule.class
         }
 )
 

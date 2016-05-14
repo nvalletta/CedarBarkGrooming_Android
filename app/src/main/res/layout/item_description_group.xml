@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+    <TextView
+        android:id="@+id/text_description"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="@dimen/text_margin"
+        android:text="@string/description_text"
+        tools:text="@string/app_name"/>
+    <Button
+        android:id="@+id/button_description"
+        style="@style/Widget.AppCompat.Button.Borderless"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/text_description"
+        android:layout_alignParentEnd="true"
+        android:textAppearance="@style/ClickableText"
+        android:layout_marginRight="@dimen/text_margin"
+        android:layout_marginEnd="@dimen/text_margin"
+        android:text="@string/text_view_image_gallery"/>
+    <View
+        android:id="@+id/view_divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_below="@+id/button_description"
+        android:background="@color/backgroundGray"
+        android:layout_marginLeft="@dimen/text_margin"
+        android:layout_marginRight="@dimen/text_margin"/>
+</RelativeLayout>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ui.HomeActivity">
+    tools:context=".ui.home.HomeActivity">
 
     <android.support.design.widget.AppBarLayout
         android:id="@+id/app_bar"
@@ -20,7 +20,18 @@
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
             app:contentScrim="?attr/colorPrimary"
+            app:expandedTitleTextAppearance="@style/ToolbarTextStyle"
             app:layout_scrollFlags="scroll|exitUntilCollapsed">
+
+            <ImageView
+                android:id="@+id/background_image"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:scaleType="centerCrop"
+                android:src="@drawable/maile"
+                app:layout_collapseMode="pin"
+                android:fitsSystemWindows="true"/>
+
 
             <android.support.v7.widget.Toolbar
                 android:id="@+id/toolbar"
