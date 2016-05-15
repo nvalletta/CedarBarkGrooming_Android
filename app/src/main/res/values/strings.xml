@@ -1,17 +1,17 @@
 <resources>
     <string name="app_name">Cedar Bark Grooming</string>
-    <string name="description_text">
+    <string name="text_intro">
         "Located in the heart of Cedar City, Cedar Bark Grooming offers one of the most unique"
         "pet grooming experiences that southern Utah has to offer.\n\nIts owner and primary"
 
-        "groomer Christine Valletta has been in the business for over"
-        "25 years, and offers high-quality service with a smile.\n\nUnlike many pet "
-
-        "grooming establishments, Cedar Bark Grooming is based out of the quaint"
+        "groomer Christine Valletta has been in the business for over "
+        "25 years, and offers high-quality service with a smile.\n\n"
+    </string>
+    <string name="description_text">
+        "Unlike many pet grooming establishments, Cedar Bark Grooming is based out of the quaint"
         "and welcoming residence of its owners, Ed and Christine Valletta. Pets feel at ease from"
         "the moment they walk through the door, which helps them reach the high standard of"
-        "quality that they are known for throughout the region.\n"
-
+        "quality that they are known for throughout the region."
     </string>
     <string name="action_settings">Settings</string>
     <string name="text_view_image_gallery">View Image Gallery</string>

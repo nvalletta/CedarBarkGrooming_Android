@@ -28,8 +28,8 @@ public class CedarBarkGroomingApplication extends Application {
                 .build());
     }
 
-    public boolean isAppInstalled(String uri) {
-        PackageManager packageManager = getApplicationContext().getPackageManager();
+    public static boolean isAppInstalled(String uri) {
+        PackageManager packageManager = getApplication().getPackageManager();
         boolean appIsInstalled = false;
         try {
             packageManager.getPackageInfo(uri, PackageManager.GET_ACTIVITIES);

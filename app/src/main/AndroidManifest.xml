@@ -25,6 +25,9 @@
         <activity
             android:name=".ui.reminders.CreateReminderActivity"
             android:label="@string/text_add_reminder" />
+        <provider
+            android:authorities="com.cedarbarkgrooming.provider.CedarBarkGrooming"
+            android:name=".data.reminders.ReminderContentProvider"/>
     </application>
 
 </manifest>

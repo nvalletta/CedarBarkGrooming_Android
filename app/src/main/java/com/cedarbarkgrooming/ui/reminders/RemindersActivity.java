@@ -2,12 +2,14 @@ package com.cedarbarkgrooming.ui.reminders;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.model.Reminder;
 import com.cedarbarkgrooming.ui.BaseActivity;
+import com.cedarbarkgrooming.ui.Presenter;
 
 import java.util.List;
 
@@ -42,12 +44,17 @@ public class RemindersActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         ButterKnife.bind(this);
-
-        // todo: kick off content provider and loader stuff
+        getPresenter().setPresentedView(this);
 
         mReminderAdapter = new ReminderAdapter();
         mRecyclerReminders.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerReminders.setAdapter(mReminderAdapter);
+    }
+
+    @NonNull
+    @Override
+    protected Presenter getPresenter() {
+        return mRemindersPresenter;
     }
 
     @Override

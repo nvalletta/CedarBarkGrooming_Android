@@ -1,15 +1,17 @@
 package com.cedarbarkgrooming.ui;
 
+import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
-import butterknife.ButterKnife;
 import icepick.Icepick;
 
 /**
  * Created by Nora on 5/7/2016.
  */
-public abstract class BaseActivity extends AppCompatActivity {
+public abstract class BaseActivity extends AppCompatActivity implements PresentedView {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -18,6 +20,9 @@ public abstract class BaseActivity extends AppCompatActivity {
         inject();
     }
 
+    @NonNull
+    protected abstract Presenter getPresenter();
+
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
@@ -25,5 +30,20 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected abstract void inject();
+
+    @Override
+    public Context getViewContext() {
+        return this;
+    }
+
+    @Override
+    public void showError(String errorMessage) {
+        Toast.makeText(this, errorMessage, Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void dismiss() {
+        onBackPressed();
+    }
 
 }
