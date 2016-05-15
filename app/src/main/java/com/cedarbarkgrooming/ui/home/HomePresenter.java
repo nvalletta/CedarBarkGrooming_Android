@@ -17,6 +17,7 @@ public class HomePresenter extends Presenter {
 
     public void onPresentedViewCreated() {
         //todo: get user's location and calculate distance. get weather.
+
     }
 
     public void onViewImageGalleryClick() {

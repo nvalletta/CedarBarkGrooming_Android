@@ -36,6 +36,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
 public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final String ERROR_LOAD_REMINDERS = "Sorry! We were unable to load your reminders at this time.";
     private static final Uri CEDAR_BARK_URI = Uri.parse("https://www.google.com/maps/place/298+N+900+W,+Cedar+City,+UT+84721/@37.6825876,-113.0769967,17z/data=!3m1!4b1!4m5!3m4!1s0x80b56198c2942025:0xaec69677c68e45f0!8m2!3d37.6825876!4d-113.074808");
     private static final int LOADER_ID = 0x01;
 
@@ -130,7 +131,7 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
                 mReminders.add(reminder);
             } catch (Exception e) {
                 Log.e("HomeActivity", e.getMessage());
-                showError("Sorry! We were unable to load your reminders at this time.");
+                showError(ERROR_LOAD_REMINDERS);
                 return;
             }
             cursor.moveToNext();
