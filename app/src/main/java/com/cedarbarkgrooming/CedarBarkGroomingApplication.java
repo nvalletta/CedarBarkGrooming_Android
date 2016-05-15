@@ -14,6 +14,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.setObjectComponent;
 public class CedarBarkGroomingApplication extends Application {
 
     private static CedarBarkGroomingApplication sApplicationInstance;
+    private static final String GOOGLE_API_KEY = "AIzaSyCdeHW8jWrm_MPNfyCiN_w9wORSrSfT0sg";
 
     public static CedarBarkGroomingApplication getApplication() {
         return sApplicationInstance;

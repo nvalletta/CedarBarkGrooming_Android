@@ -44,6 +44,9 @@ dependencies {
     testCompile 'junit:junit:4.12'
     compile 'com.android.support:appcompat-v7:23.3.0'
     compile 'com.android.support:design:23.3.0'
+
+    // Retrofit
+    compile 'com.squareup.retrofit2:retrofit:2.0.2'
     // Picasso
     compile 'com.squareup.picasso:picasso:2.5.2'
     // ButterKnife
