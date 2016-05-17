@@ -5,7 +5,7 @@ import android.content.ContentValues;
 import android.support.annotation.NonNull;
 
 import com.cedarbarkgrooming.data.reminders.ReminderContentProvider;
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.model.reminders.Reminder;
 import com.cedarbarkgrooming.ui.Presenter;
 
 import java.util.Date;

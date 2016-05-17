@@ -1,6 +1,6 @@
 package com.cedarbarkgrooming.module.modules;
 
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.model.reminders.Reminder;
 
 import java.util.ArrayList;
 import java.util.List;

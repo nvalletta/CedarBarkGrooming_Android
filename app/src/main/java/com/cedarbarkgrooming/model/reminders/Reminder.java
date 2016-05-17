@@ -1,4 +1,4 @@
-package com.cedarbarkgrooming.model;
+package com.cedarbarkgrooming.model.reminders;
 
 import java.util.Date;
 

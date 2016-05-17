@@ -9,7 +9,7 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.cedarbarkgrooming.R;
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.model.reminders.Reminder;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;

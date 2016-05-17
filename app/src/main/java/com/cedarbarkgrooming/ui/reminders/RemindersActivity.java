@@ -7,7 +7,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.cedarbarkgrooming.R;
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.model.reminders.Reminder;
 import com.cedarbarkgrooming.ui.BaseActivity;
 import com.cedarbarkgrooming.ui.Presenter;
 

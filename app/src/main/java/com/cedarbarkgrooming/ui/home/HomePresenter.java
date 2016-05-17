@@ -1,6 +1,6 @@
 package com.cedarbarkgrooming.ui.home;
 
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.model.reminders.Reminder;
 import com.cedarbarkgrooming.ui.Presenter;
 
 import java.util.List;

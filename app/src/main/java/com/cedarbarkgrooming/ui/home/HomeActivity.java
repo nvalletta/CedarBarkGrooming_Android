@@ -5,6 +5,7 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -16,7 +17,9 @@ import android.view.MenuItem;
 import com.cedarbarkgrooming.CedarBarkGroomingApplication;
 import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.data.reminders.ReminderContentProvider;
-import com.cedarbarkgrooming.model.Reminder;
+import com.cedarbarkgrooming.http.RestClient;
+import com.cedarbarkgrooming.model.reminders.Reminder;
+import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 import com.cedarbarkgrooming.ui.BaseActivity;
 import com.cedarbarkgrooming.ui.Presenter;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
@@ -31,6 +34,9 @@ import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import icepick.State;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.schedulers.Schedulers;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
@@ -39,12 +45,17 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     private static final String ERROR_LOAD_REMINDERS = "Sorry! We were unable to load your reminders at this time.";
     private static final Uri CEDAR_BARK_URI = Uri.parse("https://www.google.com/maps/place/298+N+900+W,+Cedar+City,+UT+84721/@37.6825876,-113.0769967,17z/data=!3m1!4b1!4m5!3m4!1s0x80b56198c2942025:0xaec69677c68e45f0!8m2!3d37.6825876!4d-113.074808");
     private static final int LOADER_ID = 0x01;
+    private static final int HOURS_BETWEEN_WEATHER_REQUESTS = 1;
 
     @Inject
     HomePresenter mHomePresenter;
 
     @Inject
     List<Reminder> mReminders;
+
+    @State
+    @Nullable
+    CedarBarkGroomingWeather mCedarBarkGroomingWeather;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,6 +70,12 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
         mHomePresenter.onPresentedViewCreated();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        checkForWeatherUpdate();
     }
 
     @NonNull
@@ -142,4 +159,33 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     public void onLoaderReset(Loader<Cursor> loader) {
         // no-op
     }
+
+    private void checkForWeatherUpdate() {
+        if (null == mCedarBarkGroomingWeather) {
+            requestWeatherUpdate();
+        } else {
+            if (mCedarBarkGroomingWeather.enoughTimeHasPassedSinceLastUpdate(HOURS_BETWEEN_WEATHER_REQUESTS)) {
+                requestWeatherUpdate();
+            }
+        }
+    }
+
+    private void requestWeatherUpdate() {
+        RestClient.getRestClient().getWeatherDataForCity("Cedar City", "us")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(weatherResponse1 -> weatherResponse1 != null)
+                .subscribe(
+                    (weatherResponse) -> {
+                        String description = weatherResponse.weather.description;
+                        double currentTemp = weatherResponse.main.temp;
+                        mCedarBarkGroomingWeather = new CedarBarkGroomingWeather(description, currentTemp);
+                        // todo: update views
+                    },
+                    (error) -> {
+                        Log.e("HomeActivity", "Oops! Couldn't retrieve weather data..." + error);
+                    }
+                );
+    }
+
 }
