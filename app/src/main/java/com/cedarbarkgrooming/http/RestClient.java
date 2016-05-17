@@ -1,7 +1,8 @@
 package com.cedarbarkgrooming.http;
 
-import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava.RxJavaCallAdapterFactory;
+import retrofit2.converter.gson.GsonConverterFactory;
 
 /**
  * Created by Nora on 5/16/2016.
@@ -24,7 +25,8 @@ public class RestClient {
     private static void initialize() {
         Retrofit.Builder builder = new Retrofit.Builder()
                 .baseUrl(ROOT)
-                .client(new OkHttpClient());
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
 
         Retrofit restAdapter = builder.build();
         sRestClient = restAdapter.create(Api.class);

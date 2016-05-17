@@ -5,7 +5,7 @@ package com.cedarbarkgrooming.model.weather;
  */
 public class Coord {
 
-    public int lon;
-    public int lat;
+    public double lon;
+    public double lat;
 
 }

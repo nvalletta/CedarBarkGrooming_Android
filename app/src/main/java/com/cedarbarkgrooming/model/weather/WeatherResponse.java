@@ -1,12 +1,14 @@
 package com.cedarbarkgrooming.model.weather;
 
+import java.util.List;
+
 /**
  * Created by Nora on 5/16/2016.
  */
 public class WeatherResponse {
 
     public Coord coord;
-    public Weather weather;
+    public List<Weather> weather;
     public Main main;
     public Wind wind;
     public Clouds clouds;

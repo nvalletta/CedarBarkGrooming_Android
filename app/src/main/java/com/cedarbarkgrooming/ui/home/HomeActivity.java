@@ -35,6 +35,7 @@ import javax.inject.Inject;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import icepick.State;
+import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
 
@@ -57,6 +58,9 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     @Nullable
     CedarBarkGroomingWeather mCedarBarkGroomingWeather;
 
+    @Nullable
+    Subscription mWeatherSubscription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -76,6 +80,14 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     protected void onResume() {
         super.onResume();
         checkForWeatherUpdate();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        if (null != mWeatherSubscription && !mWeatherSubscription.isUnsubscribed()) {
+            mWeatherSubscription.unsubscribe();
+        }
     }
 
     @NonNull
@@ -171,13 +183,13 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     }
 
     private void requestWeatherUpdate() {
-        RestClient.getRestClient().getWeatherDataForCity("Cedar City", "us")
+        mWeatherSubscription = RestClient.getRestClient().getWeatherDataForCity("Cedar City,us")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
-                .filter(weatherResponse1 -> weatherResponse1 != null)
+                .filter(weatherResponse1 -> (weatherResponse1 != null && weatherResponse1.weather.size() > 0))
                 .subscribe(
                     (weatherResponse) -> {
-                        String description = weatherResponse.weather.description;
+                        String description = weatherResponse.weather.get(0).description;
                         double currentTemp = weatherResponse.main.temp;
                         mCedarBarkGroomingWeather = new CedarBarkGroomingWeather(description, currentTemp);
                         // todo: update views
