@@ -9,8 +9,11 @@ import retrofit2.converter.gson.GsonConverterFactory;
  */
 public class RestClient {
 
-    private static final String ROOT = "http://api.openweathermap.org/data/2.5/";
-    private static Api sRestClient;
+    public static final String OPEN_WEATHER_API_ROOT = "http://api.openweathermap.org/data/2.5/";
+    public static final String GOOGLE_MAPS_API_ROOT = "https://maps.googleapis.com/maps/api/";
+
+    private static OpenWeatherApi sOpenWeatherClient;
+    private static GoogleApi sGoogleClient;
 
     static {
         initialize();
@@ -18,18 +21,30 @@ public class RestClient {
 
     private RestClient() { }
 
-    public static Api getRestClient() {
-        return sRestClient;
+    public static OpenWeatherApi getOpenWeatherRestClient() {
+        return sOpenWeatherClient;
+    }
+
+    public static GoogleApi getGoogleRestClient() {
+        return sGoogleClient;
     }
 
     private static void initialize() {
-        Retrofit.Builder builder = new Retrofit.Builder()
-                .baseUrl(ROOT)
+        Retrofit.Builder openWeatherApiBuilder = new Retrofit.Builder()
+                .baseUrl(OPEN_WEATHER_API_ROOT)
                 .addConverterFactory(GsonConverterFactory.create())
                 .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
 
-        Retrofit restAdapter = builder.build();
-        sRestClient = restAdapter.create(Api.class);
+        Retrofit.Builder googleApiBuilder = new Retrofit.Builder()
+                .baseUrl(GOOGLE_MAPS_API_ROOT)
+                .addConverterFactory(GsonConverterFactory.create())
+                .addCallAdapterFactory(RxJavaCallAdapterFactory.create());
+
+        Retrofit openWeatherRestAdapter = openWeatherApiBuilder.build();
+        Retrofit googleRestAdapter = googleApiBuilder.build();
+
+        sOpenWeatherClient = openWeatherRestAdapter.create(OpenWeatherApi.class);
+        sGoogleClient = googleRestAdapter.create(GoogleApi.class);
     }
 
 }

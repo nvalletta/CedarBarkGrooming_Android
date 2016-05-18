@@ -1,13 +1,16 @@
 package com.cedarbarkgrooming.ui.home;
 
+import android.Manifest;
+import android.annotation.TargetApi;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Location;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.v4.app.LoaderManager;
-import android.support.v4.content.CursorLoader;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -16,37 +19,31 @@ import android.view.MenuItem;
 
 import com.cedarbarkgrooming.CedarBarkGroomingApplication;
 import com.cedarbarkgrooming.R;
-import com.cedarbarkgrooming.data.reminders.ReminderContentProvider;
-import com.cedarbarkgrooming.http.RestClient;
 import com.cedarbarkgrooming.model.reminders.Reminder;
-import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 import com.cedarbarkgrooming.ui.BaseActivity;
 import com.cedarbarkgrooming.ui.Presenter;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import javax.inject.Inject;
 
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import icepick.State;
 import rx.Subscription;
-import rx.android.schedulers.AndroidSchedulers;
-import rx.schedulers.Schedulers;
+import rx.subjects.PublishSubject;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
 public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
 
-    private static final String ERROR_LOAD_REMINDERS = "Sorry! We were unable to load your reminders at this time.";
     private static final Uri CEDAR_BARK_URI = Uri.parse("https://www.google.com/maps/place/298+N+900+W,+Cedar+City,+UT+84721/@37.6825876,-113.0769967,17z/data=!3m1!4b1!4m5!3m4!1s0x80b56198c2942025:0xaec69677c68e45f0!8m2!3d37.6825876!4d-113.074808");
     private static final int LOADER_ID = 0x01;
-    private static final int HOURS_BETWEEN_WEATHER_REQUESTS = 1;
+
+    private static final int LOCATION_REQUEST = 1337;
+    private static final String[] LOCATION_PERMISSIONS = {
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
 
     @Inject
     HomePresenter mHomePresenter;
@@ -54,12 +51,10 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     @Inject
     List<Reminder> mReminders;
 
-    @State
-    @Nullable
-    CedarBarkGroomingWeather mCedarBarkGroomingWeather;
+    @Inject
+    PublishSubject<Location> mCurrentUserLocation;
 
-    @Nullable
-    Subscription mWeatherSubscription;
+    Subscription mCurrentLocationSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,21 +67,22 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         setSupportActionBar(toolbar);
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
-
-        mHomePresenter.onPresentedViewCreated();
+        mHomePresenter.setPresentedView(this);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        checkForWeatherUpdate();
+        mHomePresenter.onResume();
+        subscribeToCurrentUserLocation();
+        checkLocationAccess();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (null != mWeatherSubscription && !mWeatherSubscription.isUnsubscribed()) {
-            mWeatherSubscription.unsubscribe();
+        if (null != mCurrentLocationSubscription && !mCurrentLocationSubscription.isUnsubscribed()) {
+            mCurrentLocationSubscription.unsubscribe();
         }
     }
 
@@ -135,36 +131,12 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        String [] projection = new String[2];
-        projection[0] = ReminderContentProvider.TITLE;
-        projection[1] = ReminderContentProvider.DATE;
-        return new CursorLoader(
-                this,   // Parent activity context
-                ReminderContentProvider.CONTENT_URI,        // Table to query
-                projection,     // Projection to return
-                null,            // No selection clause
-                null,            // No selection arguments
-                null             // Default sort order
-        );
+        return mHomePresenter.getReminderLoader();
     }
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor cursor) {
-        cursor.moveToFirst();
-        mReminders.clear();
-        while (!cursor.isAfterLast()) {
-            try {
-                DateFormat df = new SimpleDateFormat("EEE MMMM dd hh:mm:ss z yyyy", Locale.US);
-                Date date = df.parse(cursor.getString(1));
-                Reminder reminder = new Reminder(cursor.getString(0), date);
-                mReminders.add(reminder);
-            } catch (Exception e) {
-                Log.e("HomeActivity", e.getMessage());
-                showError(ERROR_LOAD_REMINDERS);
-                return;
-            }
-            cursor.moveToNext();
-        }
+        mHomePresenter.onLoadFinished(cursor);
     }
 
     @Override
@@ -172,32 +144,45 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         // no-op
     }
 
-    private void checkForWeatherUpdate() {
-        if (null == mCedarBarkGroomingWeather) {
-            requestWeatherUpdate();
-        } else {
-            if (mCedarBarkGroomingWeather.enoughTimeHasPassedSinceLastUpdate(HOURS_BETWEEN_WEATHER_REQUESTS)) {
-                requestWeatherUpdate();
-            }
-        }
-    }
-
-    private void requestWeatherUpdate() {
-        mWeatherSubscription = RestClient.getRestClient().getWeatherDataForCity("Cedar City,us")
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .filter(weatherResponse1 -> (weatherResponse1 != null && weatherResponse1.weather.size() > 0))
+    private void subscribeToCurrentUserLocation() {
+        mCurrentLocationSubscription =
+            mCurrentUserLocation
+                .distinctUntilChanged()
                 .subscribe(
-                    (weatherResponse) -> {
-                        String description = weatherResponse.weather.get(0).description;
-                        double currentTemp = weatherResponse.main.temp;
-                        mCedarBarkGroomingWeather = new CedarBarkGroomingWeather(description, currentTemp);
-                        // todo: update views
+                    (location) -> {
+                        // todo: populate view
+                        mHomePresenter.discoverTimeToReachCedarBark(location);
+                        Log.d("HomeActivity", "" + location);
                     },
                     (error) -> {
-                        Log.e("HomeActivity", "Oops! Couldn't retrieve weather data..." + error);
+                        Log.e("HomeActivity", "Error getting user location.");
                     }
                 );
     }
 
+    private void checkLocationAccess() {
+        if (hasLocationAccess()) {
+            mHomePresenter.updateDistanceToCedarBark();
+        } else {
+            askUserForLocationPermission();
+        }
+    }
+
+    @TargetApi(23)
+    private void askUserForLocationPermission() {
+        requestPermissions(LOCATION_PERMISSIONS, LOCATION_REQUEST);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        mHomePresenter.updateDistanceToCedarBark();
+    }
+
+    private boolean hasLocationAccess() {
+        return ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) ==
+                PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
+                        PackageManager.PERMISSION_GRANTED;
+    }
 }
