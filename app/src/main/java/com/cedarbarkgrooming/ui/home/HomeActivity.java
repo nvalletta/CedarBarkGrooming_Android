@@ -5,21 +5,24 @@ import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-import android.location.Location;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 import com.cedarbarkgrooming.CedarBarkGroomingApplication;
 import com.cedarbarkgrooming.R;
+import com.cedarbarkgrooming.model.maps.Distance;
 import com.cedarbarkgrooming.model.reminders.Reminder;
+import com.cedarbarkgrooming.model.weather.Weather;
 import com.cedarbarkgrooming.ui.BaseActivity;
 import com.cedarbarkgrooming.ui.Presenter;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
@@ -28,10 +31,9 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import rx.Subscription;
-import rx.subjects.PublishSubject;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
@@ -51,10 +53,11 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     @Inject
     List<Reminder> mReminders;
 
-    @Inject
-    PublishSubject<Location> mCurrentUserLocation;
+    @BindView(R.id.text_weather)
+    TextView mTextWeather;
 
-    Subscription mCurrentLocationSubscription;
+    @BindView(R.id.text_distance)
+    TextView mTextDistance;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,16 +77,12 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     protected void onResume() {
         super.onResume();
         mHomePresenter.onResume();
-        subscribeToCurrentUserLocation();
         checkLocationAccess();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (null != mCurrentLocationSubscription && !mCurrentLocationSubscription.isUnsubscribed()) {
-            mCurrentLocationSubscription.unsubscribe();
-        }
     }
 
     @NonNull
@@ -144,22 +143,6 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         // no-op
     }
 
-    private void subscribeToCurrentUserLocation() {
-        mCurrentLocationSubscription =
-            mCurrentUserLocation
-                .distinctUntilChanged()
-                .subscribe(
-                    (location) -> {
-                        // todo: populate view
-                        mHomePresenter.discoverTimeToReachCedarBark(location);
-                        Log.d("HomeActivity", "" + location);
-                    },
-                    (error) -> {
-                        Log.e("HomeActivity", "Error getting user location.");
-                    }
-                );
-    }
-
     private void checkLocationAccess() {
         if (hasLocationAccess()) {
             mHomePresenter.updateDistanceToCedarBark();
@@ -170,7 +153,9 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
 
     @TargetApi(23)
     private void askUserForLocationPermission() {
-        requestPermissions(LOCATION_PERMISSIONS, LOCATION_REQUEST);
+        if (Build.VERSION.SDK_INT >= 23) {
+            requestPermissions(LOCATION_PERMISSIONS, LOCATION_REQUEST);
+        }
     }
 
     @Override
@@ -184,5 +169,27 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
                 PackageManager.PERMISSION_GRANTED &&
                 ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_COARSE_LOCATION) ==
                         PackageManager.PERMISSION_GRANTED;
+    }
+
+    @Override
+    public void displayDistanceInformation(@NonNull Distance distance) {
+        String message = getString(R.string.text_distance, distance.text);
+        mTextDistance.setText(message);
+    }
+
+    @Override
+    public void displayWeatherInformation(Weather weather) {
+        String message = getString(R.string.text_weather, weather.description);
+        mTextDistance.setText(message);
+    }
+
+    @Override
+    public void hideDistanceText() {
+        mTextDistance.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void hideWeatherText() {
+        mTextWeather.setVisibility(View.GONE);
     }
 }

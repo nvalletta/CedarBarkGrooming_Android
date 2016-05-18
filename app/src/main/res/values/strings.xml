@@ -21,4 +21,6 @@
     <string name="text_add_reminder">Add a Reminder</string>
     <string name="text_edit_reminder_description">Just enter the purpose of your reminder and the date you\'d like to be reminded on, and you\'re all set!</string>
     <string name="text_done">All finished? Click here!</string>
+    <string name="text_distance">You\'re only %s away!</string>
+    <string name="text_weather">Weather: %s</string>
 </resources>

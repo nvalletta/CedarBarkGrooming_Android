@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.location.Location;
 import android.location.LocationManager;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -11,6 +12,10 @@ import android.util.Log;
 
 import com.cedarbarkgrooming.data.reminders.ReminderContentProvider;
 import com.cedarbarkgrooming.http.RestClient;
+import com.cedarbarkgrooming.model.maps.Distance;
+import com.cedarbarkgrooming.model.maps.Leg;
+import com.cedarbarkgrooming.model.maps.MapsResponse;
+import com.cedarbarkgrooming.model.maps.Route;
 import com.cedarbarkgrooming.model.reminders.Reminder;
 import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 import com.cedarbarkgrooming.ui.Presenter;
@@ -26,7 +31,6 @@ import javax.inject.Inject;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.schedulers.Schedulers;
-import rx.subjects.PublishSubject;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
@@ -37,12 +41,10 @@ public class HomePresenter extends Presenter {
 
     private static final String ERROR_LOAD_REMINDERS = "Sorry! We were unable to load your reminders at this time.";
     private static final int HOURS_BETWEEN_WEATHER_REQUESTS = 1;
+    private static final String STANDARD_DATE_FORMAT = "EEE MMMM dd hh:mm:ss z yyyy";
 
     @Inject
     List<Reminder> mReminders;
-
-    @Inject
-    PublishSubject<Location> mCurrentUserLocation;
 
     @Nullable
     Subscription mWeatherSubscription;
@@ -85,7 +87,7 @@ public class HomePresenter extends Presenter {
         mReminders.clear();
         while (!cursor.isAfterLast()) {
             try {
-                DateFormat df = new SimpleDateFormat("EEE MMMM dd hh:mm:ss z yyyy", Locale.US);
+                DateFormat df = new SimpleDateFormat(STANDARD_DATE_FORMAT, Locale.US);
                 Date date = df.parse(cursor.getString(1));
                 Reminder reminder = new Reminder(cursor.getString(0), date);
                 mReminders.add(reminder);
@@ -104,32 +106,46 @@ public class HomePresenter extends Presenter {
 
         try {
             LocationManager lm = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
-            mCurrentUserLocation.onNext(lm.getLastKnownLocation(LocationManager.GPS_PROVIDER));
-//            Location cedarBarkLocation = new Location("");
-//            cedarBarkLocation.setLatitude(37.6825876);
-//            cedarBarkLocation.setLatitude(-113.0769967);
-//
-//            float distanceInMeters = userLocation.distanceTo(cedarBarkLocation);
-//            double distanceInMiles = distanceInMeters * 0.000621371;
+            Location currentUserLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (null !=currentUserLocation) {
+                discoverTimeToReachCedarBark(currentUserLocation);
+            }
         } catch (SecurityException ex) {
             Log.e("HomePresenter", "Error: couldn't calculate distance: " + ex.getMessage());
         }
     }
 
-    public void discoverTimeToReachCedarBark(Location userLocation) {
+    public void discoverTimeToReachCedarBark(@Nullable Location userLocation) {
+        if (null == userLocation) return;
         String position = userLocation.getLatitude() + "," + userLocation.getLongitude();
+        mPresentedView.hideDistanceText();
         RestClient.getGoogleRestClient().getDistanceDataForLocation(position)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .filter(mapsResponse -> mapsResponse != null)
+                .map(this::getDistanceFromMapsResponse)
+                .filter(distance -> distance != null)
                 .subscribe(
-                        (response) -> {
-                            Log.w("HomePresenter", response + "");
+                        (distance) -> {
+                            Log.w("HomePresenter", distance.text);
+                            mPresentedView.displayDistanceInformation(distance);
                         },
                         (error) -> {
-                            Log.e("HomeActivity", "Oops! Couldn't retrieve weather data..." + error);
+                            Log.e("HomeActivity", "Oops! Couldn't retrieve distance data..." + error);
                         }
                 );
+    }
+
+    @Nullable
+    private Distance getDistanceFromMapsResponse(@NonNull MapsResponse response) {
+        if (response.routes != null && response.routes.size() > 0) {
+            Route route = response.routes.get(0);
+            if (route.legs != null && route.legs.size() > 0) {
+                Leg leg = route.legs.get(0);
+                return leg.distance;
+            }
+        }
+        return null;
     }
 
     private void checkForWeatherUpdate() {
@@ -144,6 +160,7 @@ public class HomePresenter extends Presenter {
 
     private void requestWeatherUpdate() {
         mIsUpdating = true;
+        mPresentedView.hideWeatherText();
         mWeatherSubscription = RestClient.getOpenWeatherRestClient().getWeatherDataForCity("Cedar City,us")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
