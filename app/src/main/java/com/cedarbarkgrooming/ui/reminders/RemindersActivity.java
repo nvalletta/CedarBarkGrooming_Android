@@ -2,14 +2,12 @@ package com.cedarbarkgrooming.ui.reminders;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 
 import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.model.reminders.Reminder;
 import com.cedarbarkgrooming.ui.BaseActivity;
-import com.cedarbarkgrooming.ui.Presenter;
 
 import java.util.List;
 
@@ -24,9 +22,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 /**
  * Created by Nora on 5/14/2016.
  */
-public class RemindersActivity extends BaseActivity {
-
-    public static final String RESULT_REMINDER = "createNewReminderResult";
+public class RemindersActivity extends BaseActivity implements RemindersView {
 
     @Inject
     RemindersPresenter mRemindersPresenter;
@@ -44,17 +40,11 @@ public class RemindersActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_reminders);
         ButterKnife.bind(this);
-        getPresenter().setPresentedView(this);
+        mRemindersPresenter.setPresentedView(this);
 
         mReminderAdapter = new ReminderAdapter();
         mRecyclerReminders.setLayoutManager(new LinearLayoutManager(this));
         mRecyclerReminders.setAdapter(mReminderAdapter);
-    }
-
-    @NonNull
-    @Override
-    protected Presenter getPresenter() {
-        return mRemindersPresenter;
     }
 
     @Override

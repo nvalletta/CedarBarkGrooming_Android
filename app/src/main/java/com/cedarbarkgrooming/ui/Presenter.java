@@ -8,11 +8,11 @@ import android.support.annotation.Nullable;
 /**
  * Created by Nora on 5/15/2016.
  */
-public abstract class Presenter {
+public abstract class Presenter<V extends PresentedView> {
 
-    protected PresentedView mPresentedView;
+    protected V mPresentedView;
 
-    public void setPresentedView(@NonNull PresentedView presentedView) {
+    public void setPresentedView(@NonNull V presentedView) {
         mPresentedView = presentedView;
     }
 

@@ -1,5 +1,6 @@
 package com.cedarbarkgrooming.module;
 
+import com.cedarbarkgrooming.sync.CedarBarkSyncAdapter;
 import com.cedarbarkgrooming.ui.home.HomeActivity;
 import com.cedarbarkgrooming.ui.home.HomePresenter;
 import com.cedarbarkgrooming.ui.reminders.CreateReminderActivity;
@@ -21,4 +22,5 @@ public interface Injector {
     void inject(ReminderAdapter target);
     void inject(RemindersPresenter target);
     void inject(HomePresenter target);
+    void inject(CedarBarkSyncAdapter target);
 }

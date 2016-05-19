@@ -1,8 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.cedarbarkgrooming">
+
+    <!-- Network Request Permissions -->
     <uses-permission android:name="android.permission.INTERNET"/>
+
+    <!-- Location Permissions -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+
+    <!-- Sync Permissions -->
+    <uses-permission android:name="android.permission.READ_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.WRITE_SYNC_SETTINGS"/>
+    <uses-permission android:name="android.permission.AUTHENTICATE_ACCOUNTS" />
+
     <application
         android:name=".CedarBarkGroomingApplication"
         android:allowBackup="true"
@@ -27,8 +37,25 @@
             android:name=".ui.reminders.CreateReminderActivity"
             android:label="@string/text_add_reminder" />
         <provider
-            android:authorities="com.cedarbarkgrooming.provider.CedarBarkGrooming"
-            android:name=".data.reminders.ReminderContentProvider"/>
+            android:authorities="@string/content_provider_authority"
+            android:name=".data.reminders.ReminderContentProvider"
+            android:syncable="true"
+            android:exported="false" />
+        <service android:name=".sync.CedarBarkSyncService"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.content.SyncAdapter"/>
+            </intent-filter>
+            <meta-data android:name="android.content.SyncAdapter"
+                android:resource="@xml/syncadapter" />
+        </service>
+        <service android:name=".sync.CedarBarkAuthenticatorService">
+            <intent-filter>
+                <action android:name="android.accounts.AccountAuthenticator" />
+            </intent-filter>
+            <meta-data android:name="android.accounts.AccountAuthenticator"
+                android:resource="@xml/authenticator" />
+        </service>
     </application>
 
 </manifest>

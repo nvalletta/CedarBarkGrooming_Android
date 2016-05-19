@@ -13,6 +13,7 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,23 +22,23 @@ import android.widget.TextView;
 import com.cedarbarkgrooming.CedarBarkGroomingApplication;
 import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.model.maps.Distance;
-import com.cedarbarkgrooming.model.reminders.Reminder;
-import com.cedarbarkgrooming.model.weather.Weather;
+import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
+import com.cedarbarkgrooming.sync.CedarBarkSyncAdapter;
 import com.cedarbarkgrooming.ui.BaseActivity;
-import com.cedarbarkgrooming.ui.Presenter;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
-
-import java.util.List;
 
 import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import rx.Subscription;
+import rx.android.schedulers.AndroidSchedulers;
+import rx.subjects.BehaviorSubject;
 
 import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 
-public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCallbacks<Cursor> {
+public class HomeActivity extends BaseActivity implements HomeView, LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final Uri CEDAR_BARK_URI = Uri.parse("https://www.google.com/maps/place/298+N+900+W,+Cedar+City,+UT+84721/@37.6825876,-113.0769967,17z/data=!3m1!4b1!4m5!3m4!1s0x80b56198c2942025:0xaec69677c68e45f0!8m2!3d37.6825876!4d-113.074808");
     private static final int LOADER_ID = 0x01;
@@ -51,7 +52,7 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     HomePresenter mHomePresenter;
 
     @Inject
-    List<Reminder> mReminders;
+    BehaviorSubject<String> mDistanceSubject;
 
     @BindView(R.id.text_weather)
     TextView mTextWeather;
@@ -59,18 +60,23 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     @BindView(R.id.text_distance)
     TextView mTextDistance;
 
+    Subscription mSubscription;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
-        getPresenter().setPresentedView(this);
+        mHomePresenter.setPresentedView(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
         getSupportLoaderManager().initLoader(LOADER_ID, null, this);
         mHomePresenter.setPresentedView(this);
+
+        watchForDistanceUpdates();
+        syncData();
     }
 
     @Override
@@ -78,17 +84,17 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         super.onResume();
         mHomePresenter.onResume();
         checkLocationAccess();
+        if (null == mSubscription || mSubscription.isUnsubscribed()) {
+            watchForDistanceUpdates();
+        }
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-    }
-
-    @NonNull
-    @Override
-    protected Presenter getPresenter() {
-        return mHomePresenter;
+        if (null != mSubscription && !mSubscription.isUnsubscribed()) {
+            mSubscription.unsubscribe();
+        }
     }
 
     @Override
@@ -143,9 +149,14 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
         // no-op
     }
 
+    private void syncData() {
+        CedarBarkSyncAdapter.syncImmediately(this);
+    }
+
     private void checkLocationAccess() {
         if (hasLocationAccess()) {
-            mHomePresenter.updateDistanceToCedarBark();
+            //todo: start sync adapter service
+            CedarBarkSyncAdapter.initialize(this);
         } else {
             askUserForLocationPermission();
         }
@@ -161,7 +172,7 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        mHomePresenter.updateDistanceToCedarBark();
+        syncData();
     }
 
     private boolean hasLocationAccess() {
@@ -171,16 +182,38 @@ public class HomeActivity extends BaseActivity implements LoaderManager.LoaderCa
                         PackageManager.PERMISSION_GRANTED;
     }
 
+    private void watchForDistanceUpdates() {
+        mDistanceSubject
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        (distance) -> {
+                            if (null == distance || distance.isEmpty()) {
+                                hideDistanceText();
+                            } else {
+                                mTextDistance.setText(distance);
+                                mTextDistance.setVisibility(View.VISIBLE);
+                            }
+                        },
+                        (error) -> {
+                            Log.e("HomeActivity", "Error finding distance to Cedar Bark.");
+                            mTextDistance.setText("");
+                            hideDistanceText();
+                        }
+                );
+    }
+
     @Override
     public void displayDistanceInformation(@NonNull Distance distance) {
         String message = getString(R.string.text_distance, distance.text);
         mTextDistance.setText(message);
+        mTextDistance.setVisibility(View.VISIBLE);
     }
 
     @Override
-    public void displayWeatherInformation(Weather weather) {
-        String message = getString(R.string.text_weather, weather.description);
-        mTextDistance.setText(message);
+    public void displayWeatherInformation(CedarBarkGroomingWeather weather) {
+        String message = getString(R.string.text_weather, weather.getCurrentTemperatureFahrenheit());
+        mTextWeather.setText(message);
+        mTextWeather.setVisibility(View.VISIBLE);
     }
 
     @Override

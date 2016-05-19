@@ -2,7 +2,6 @@ package com.cedarbarkgrooming.ui;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
@@ -19,9 +18,6 @@ public abstract class BaseActivity extends AppCompatActivity implements Presente
         Icepick.restoreInstanceState(this, savedInstanceState);
         inject();
     }
-
-    @NonNull
-    protected abstract Presenter getPresenter();
 
     @Override
     protected void onSaveInstanceState(Bundle outState) {

@@ -37,7 +37,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 /**
  * Created by Nora on 5/7/2016.
  */
-public class HomePresenter extends Presenter {
+public class HomePresenter extends Presenter<HomeView> {
 
     private static final String ERROR_LOAD_REMINDERS = "Sorry! We were unable to load your reminders at this time.";
     private static final int HOURS_BETWEEN_WEATHER_REQUESTS = 1;
@@ -152,9 +152,9 @@ public class HomePresenter extends Presenter {
         if (null == mCedarBarkGroomingWeather) {
             requestWeatherUpdate();
         } else {
-            if (mCedarBarkGroomingWeather.enoughTimeHasPassedSinceLastUpdate(HOURS_BETWEEN_WEATHER_REQUESTS)) {
+//            if (mCedarBarkGroomingWeather.enoughTimeHasPassedSinceLastUpdate(HOURS_BETWEEN_WEATHER_REQUESTS)) {
                 requestWeatherUpdate();
-            }
+//            }
         }
     }
 
@@ -170,7 +170,7 @@ public class HomePresenter extends Presenter {
                             String description = weatherResponse.weather.get(0).description;
                             double currentTemp = weatherResponse.main.temp;
                             mCedarBarkGroomingWeather = new CedarBarkGroomingWeather(description, currentTemp);
-                            // todo: update views
+                            mPresentedView.displayWeatherInformation(mCedarBarkGroomingWeather);
                         },
                         (error) -> Log.e("HomePresenter", "Oops! Couldn't retrieve weather data..." + error),
                         () -> mIsUpdating = false

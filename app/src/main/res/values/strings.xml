@@ -1,8 +1,9 @@
 <resources>
     <string name="app_name">Cedar Bark Grooming</string>
+    <string name="content_provider_authority">com.cedarbarkgrooming.provider.CedarBarkGrooming</string>
     <string name="text_intro">
-        "Located in the heart of Cedar City, Cedar Bark Grooming offers one of the most unique"
-        "pet grooming experiences that southern Utah has to offer.\n\nIts owner and primary"
+        "Located in the heart of Cedar City, Cedar Bark Grooming offers a variety of pet grooming"
+        "services, including nails, bath, brush-outs and more.\n\nIts owner and primary"
 
         "groomer Christine Valletta has been in the business for over "
         "25 years, and offers high-quality service with a smile.\n\n"
@@ -22,5 +23,6 @@
     <string name="text_edit_reminder_description">Just enter the purpose of your reminder and the date you\'d like to be reminded on, and you\'re all set!</string>
     <string name="text_done">All finished? Click here!</string>
     <string name="text_distance">You\'re only %s away!</string>
-    <string name="text_weather">Weather: %s</string>
+    <string name="text_weather">It\'s %s degrees in Cedar City.</string>
+    <string name="sync_account_type">currentDistanceFromCedarBarkGrooming</string>
 </resources>

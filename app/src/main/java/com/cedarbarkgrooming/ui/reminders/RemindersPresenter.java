@@ -17,7 +17,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 /**
  * Created by Nora on 5/14/2016.
  */
-public class RemindersPresenter extends Presenter {
+public class RemindersPresenter extends Presenter<RemindersView> {
 
     private static final String ERROR_DELETING_REMINDER = "Uh oh, a problem occurred while deleting your Reminder. Please try again later.";
 

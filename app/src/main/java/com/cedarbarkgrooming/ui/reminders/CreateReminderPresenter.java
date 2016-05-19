@@ -6,6 +6,7 @@ import android.support.annotation.NonNull;
 
 import com.cedarbarkgrooming.data.reminders.ReminderContentProvider;
 import com.cedarbarkgrooming.model.reminders.Reminder;
+import com.cedarbarkgrooming.ui.PresentedView;
 import com.cedarbarkgrooming.ui.Presenter;
 
 import java.util.Date;
@@ -18,7 +19,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 /**
  * Created by Nora on 5/14/2016.
  */
-public class CreateReminderPresenter extends Presenter {
+public class CreateReminderPresenter extends Presenter<PresentedView> {
 
     private static final String ERROR_ADDING_REMINDER = "Sorry! A problem occurred while adding your reminder.";
 

@@ -2,6 +2,7 @@ package com.cedarbarkgrooming.model.weather;
 
 import android.util.Log;
 
+import java.text.DecimalFormat;
 import java.util.Date;
 
 /**
@@ -20,7 +21,8 @@ public class CedarBarkGroomingWeather {
     }
 
     public double getCurrentTemperatureFahrenheit() {
-        return (currentTemperature - 273.15) * 1.8 + 32;
+        DecimalFormat twoDForm = new DecimalFormat("#.#");
+        return Double.valueOf(twoDForm.format((currentTemperature - 273.15) * 1.8 + 32));
     }
 
     /**
