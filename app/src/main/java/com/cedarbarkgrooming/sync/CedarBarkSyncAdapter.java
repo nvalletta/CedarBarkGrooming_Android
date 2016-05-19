@@ -22,6 +22,7 @@ import com.cedarbarkgrooming.model.maps.Distance;
 import com.cedarbarkgrooming.model.maps.Leg;
 import com.cedarbarkgrooming.model.maps.MapsResponse;
 import com.cedarbarkgrooming.model.maps.Route;
+import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 
 import javax.inject.Inject;
 
@@ -40,6 +41,9 @@ public class CedarBarkSyncAdapter extends AbstractThreadedSyncAdapter {
     @Inject
     BehaviorSubject<String> mDistanceSubject;
 
+    @Inject
+    BehaviorSubject<CedarBarkGroomingWeather> mWeatherSubject;
+
     public CedarBarkSyncAdapter(Context context, boolean autoInitialize) {
         super(context, autoInitialize);
         getInjector().inject(this);
@@ -51,18 +55,11 @@ public class CedarBarkSyncAdapter extends AbstractThreadedSyncAdapter {
 
     @Override
     public void onPerformSync(Account account, Bundle extras, String authority, ContentProviderClient provider, SyncResult syncResult) {
-        try {
-            LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-            Location currentUserLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (null !=currentUserLocation) {
-                discoverTimeToReachCedarBark(currentUserLocation);
-            }
-        } catch (SecurityException ex) {
-            Log.e("HomePresenter", "Error: couldn't calculate distance: " + ex.getMessage());
-        }
+        discoverTimeToReachCedarBark();
+        sendWeatherRequest();
     }
 
-    public void discoverTimeToReachCedarBark(@Nullable Location userLocation) {
+    public void sendDistanceRequest(@Nullable Location userLocation) {
         if (null == userLocation) return;
         String position = userLocation.getLatitude() + "," + userLocation.getLongitude();
         RestClient.getGoogleRestClient().getDistanceDataForLocation(position)
@@ -73,13 +70,41 @@ public class CedarBarkSyncAdapter extends AbstractThreadedSyncAdapter {
                 .filter(distance -> distance != null)
                 .subscribe(
                         (distance) -> {
-                            Log.w("HomePresenter", distance.text);
+                            Log.w("CedarBarkSyncAdapter", distance.text);
                             mDistanceSubject.onNext(distance.text);
                         },
                         (error) -> {
-                            Log.e("HomeActivity", "Oops! Couldn't retrieve distance data..." + error);
+                            Log.e("CedarBarkSyncAdapter", "Oops! Couldn't retrieve distance data..." + error);
                         }
                 );
+    }
+
+    private void discoverTimeToReachCedarBark() {
+        try {
+            LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
+            Location currentUserLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            if (null !=currentUserLocation) {
+                sendDistanceRequest(currentUserLocation);
+            }
+        } catch (SecurityException ex) {
+            Log.e("CedarBarkSyncAdapter", "Error: couldn't calculate distance: " + ex.getMessage());
+        }
+    }
+
+    private void sendWeatherRequest() {
+        RestClient.getOpenWeatherRestClient().getWeatherDataForCity("Cedar City,us")
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .filter(weatherResponse1 -> (weatherResponse1 != null && weatherResponse1.weather.size() > 0))
+                .subscribe(
+                        (weatherResponse) -> {
+                            String description = weatherResponse.weather.get(0).description;
+                            double currentTemp = weatherResponse.main.temp;
+                            CedarBarkGroomingWeather weather = new CedarBarkGroomingWeather(description, currentTemp);
+                            mWeatherSubject.onNext(weather);
+                        },
+                        (error) -> Log.e("CedarBarkSyncAdapter", "Oops! Couldn't retrieve weather data..." + error)
+                        );
     }
 
     @Nullable

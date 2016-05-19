@@ -1,6 +1,7 @@
 package com.cedarbarkgrooming.module.modules;
 
 import com.cedarbarkgrooming.model.reminders.Reminder;
+import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -26,6 +27,12 @@ public class ObjectModule {
     @Provides
     @Singleton
     BehaviorSubject<String> getDistanceSubject() {
+        return BehaviorSubject.create();
+    }
+
+    @Provides
+    @Singleton
+    BehaviorSubject<CedarBarkGroomingWeather> getWeatherSubject() {
         return BehaviorSubject.create();
     }
 

@@ -54,13 +54,18 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
     @Inject
     BehaviorSubject<String> mDistanceSubject;
 
+    @Inject
+    BehaviorSubject<CedarBarkGroomingWeather> mWeatherSubject;
+
     @BindView(R.id.text_weather)
     TextView mTextWeather;
 
     @BindView(R.id.text_distance)
     TextView mTextDistance;
 
-    Subscription mSubscription;
+    Subscription mDistanceSubscription;
+
+    Subscription mWeatherSubscription;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -76,24 +81,38 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
         mHomePresenter.setPresentedView(this);
 
         watchForDistanceUpdates();
+        watchForWeatherUpdates();
         syncData();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        mHomePresenter.onResume();
         checkLocationAccess();
-        if (null == mSubscription || mSubscription.isUnsubscribed()) {
-            watchForDistanceUpdates();
-        }
+        watchEvents();
     }
 
     @Override
     protected void onPause() {
         super.onPause();
-        if (null != mSubscription && !mSubscription.isUnsubscribed()) {
-            mSubscription.unsubscribe();
+        unwatchEvents();
+    }
+
+    private void watchEvents() {
+        if (null == mDistanceSubscription || mDistanceSubscription.isUnsubscribed()) {
+            watchForDistanceUpdates();
+        }
+        if (null == mWeatherSubscription || mWeatherSubscription.isUnsubscribed()) {
+            watchForWeatherUpdates();
+        }
+    }
+
+    private void unwatchEvents() {
+        if (null != mDistanceSubscription && !mDistanceSubscription.isUnsubscribed()) {
+            mDistanceSubscription.unsubscribe();
+        }
+        if (null != mWeatherSubscription && !mWeatherSubscription.isUnsubscribed()) {
+            mWeatherSubscription.unsubscribe();
         }
     }
 
@@ -183,23 +202,48 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
     }
 
     private void watchForDistanceUpdates() {
-        mDistanceSubject
+        mDistanceSubscription = mDistanceSubject
                 .subscribeOn(AndroidSchedulers.mainThread())
                 .subscribe(
-                        (distance) -> {
-                            if (null == distance || distance.isEmpty()) {
-                                hideDistanceText();
-                            } else {
-                                mTextDistance.setText(distance);
-                                mTextDistance.setVisibility(View.VISIBLE);
-                            }
-                        },
+                        this::populateDistanceView,
                         (error) -> {
                             Log.e("HomeActivity", "Error finding distance to Cedar Bark.");
                             mTextDistance.setText("");
                             hideDistanceText();
                         }
                 );
+    }
+
+    private void watchForWeatherUpdates() {
+        mWeatherSubscription = mWeatherSubject
+                .subscribeOn(AndroidSchedulers.mainThread())
+                .subscribe(
+                        this::populateWeatherView,
+                        (error) -> {
+                            Log.e("HomeActivity", "Error finding distance to Cedar Bark.");
+                            mTextWeather.setText("");
+                            hideWeatherText();
+                        }
+                );
+    }
+
+    private void populateDistanceView(String distance) {
+        if (null == distance || distance.isEmpty()) {
+            hideDistanceText();
+        } else {
+            mTextDistance.setText(getString(R.string.text_distance, distance));
+            mTextDistance.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private void populateWeatherView(CedarBarkGroomingWeather weather) {
+        if (null == weather) {
+            hideDistanceText();
+        } else {
+            mTextWeather.setText(getString(R.string.text_weather,
+                    weather.getCurrentTemperatureFahrenheit()));
+            mTextWeather.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
