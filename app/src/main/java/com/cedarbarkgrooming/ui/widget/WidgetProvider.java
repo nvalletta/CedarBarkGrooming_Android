@@ -1,6 +1,5 @@
 package com.cedarbarkgrooming.ui.widget;
 
-import android.app.PendingIntent;
 import android.appwidget.AppWidgetManager;
 import android.appwidget.AppWidgetProvider;
 import android.content.Context;
@@ -9,7 +8,6 @@ import android.net.Uri;
 import android.widget.RemoteViews;
 
 import com.cedarbarkgrooming.R;
-import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 
 public class WidgetProvider extends AppWidgetProvider {
 
@@ -28,14 +26,8 @@ public class WidgetProvider extends AppWidgetProvider {
 
             widget.setRemoteAdapter(R.id.list_reminders, intent);
 
-            Intent clickIntent = new Intent(context, RemindersActivity.class);
-            PendingIntent clickWidget = PendingIntent
-                    .getActivity(context, 0,
-                            clickIntent,
-                            PendingIntent.FLAG_UPDATE_CURRENT);
-
-            widget.setPendingIntentTemplate(R.id.list_reminders, clickWidget);
             appWidgetManager.updateAppWidget(widgetId, widget);
+            appWidgetManager.notifyAppWidgetViewDataChanged(widgetId, R.layout.widget_reminders);
         }
 
         super.onUpdate(context, appWidgetManager, appWidgetIds);

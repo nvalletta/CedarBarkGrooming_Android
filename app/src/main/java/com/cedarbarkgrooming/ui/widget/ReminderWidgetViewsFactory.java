@@ -1,6 +1,7 @@
 package com.cedarbarkgrooming.ui.widget;
 
 import android.content.Context;
+import android.util.Log;
 import android.widget.RemoteViews;
 import android.widget.RemoteViewsService.RemoteViewsFactory;
 
@@ -32,6 +33,7 @@ public class ReminderWidgetViewsFactory implements RemoteViewsFactory {
     @Override
     public void onDataSetChanged() {
         //no-op
+        Log.w("ReminderViewsFactory", "" + mReminders);
     }
 
     @Override
@@ -46,7 +48,7 @@ public class ReminderWidgetViewsFactory implements RemoteViewsFactory {
 
     @Override
     public RemoteViews getViewAt(int position) {
-        RemoteViews row = new RemoteViews(mContext.getPackageName(), R.layout.item_reminder);
+        RemoteViews row = new RemoteViews(mContext.getPackageName(), R.layout.widget_item_reminder);
 
         row.setTextViewText(R.id.text_reminder_title, mReminders.get(position).getTitle());
         row.setTextViewText(R.id.text_reminder_date, mReminders.get(position).getDate().toString());

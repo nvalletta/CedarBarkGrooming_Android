@@ -43,6 +43,7 @@ public class RemindersPresenter extends Presenter<RemindersView> {
                         + "' AND " + ReminderContentProvider.DATE + " = '" + reminder.getDate().toString() + "'";
                 contentResolver.delete(ReminderContentProvider.CONTENT_URI, where, null);
                 mReminders.remove(reminder);
+                notifyRemoteViews();
                 if (null != mRemindersChangeListener) {
                     mRemindersChangeListener.onRemindersChanged();
                 }

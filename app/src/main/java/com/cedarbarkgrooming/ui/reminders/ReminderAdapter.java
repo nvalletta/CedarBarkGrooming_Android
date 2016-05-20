@@ -3,7 +3,9 @@ package com.cedarbarkgrooming.ui.reminders;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 
+import com.cedarbarkgrooming.R;
 import com.cedarbarkgrooming.model.reminders.Reminder;
 
 import java.util.List;
@@ -42,6 +44,10 @@ public class ReminderAdapter extends RecyclerView.Adapter<ReminderAdapter.ViewHo
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = new ReminderItem(parent.getContext());
+
+        Button deleteButton = (Button) view.findViewById(R.id.button_delete);
+        deleteButton.setVisibility(View.VISIBLE);
+
         return new ReminderAdapter.ViewHolder((ReminderItem)view);
     }
 

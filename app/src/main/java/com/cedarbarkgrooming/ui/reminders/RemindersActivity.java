@@ -56,7 +56,9 @@ public class RemindersActivity extends BaseActivity implements RemindersView {
     @Override
     protected void onResume() {
         super.onResume();
-        mRemindersPresenter.setRemindersChangeListener(() -> mReminderAdapter.notifyDataSetChanged());
+        mRemindersPresenter.setRemindersChangeListener(() -> {
+            mReminderAdapter.notifyDataSetChanged();
+        });
     }
 
     @Override
