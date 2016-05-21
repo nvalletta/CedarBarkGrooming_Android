@@ -34,10 +34,6 @@ public class HomePresenter extends Presenter<HomeView> {
         getInjector().inject(this);
     }
 
-    public void onViewImageGalleryClick() {
-        // todo: open image gallery
-    }
-
     public Loader<Cursor> getReminderLoader() {
         String[] projection = new String[2];
         projection[0] = ReminderContentProvider.TITLE;

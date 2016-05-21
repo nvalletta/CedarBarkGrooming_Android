@@ -2,6 +2,8 @@ package com.cedarbarkgrooming.module;
 
 import com.cedarbarkgrooming.sync.CedarBarkSyncAdapter;
 import com.cedarbarkgrooming.ui.gallery.GalleryActivity;
+import com.cedarbarkgrooming.ui.gallery.GridBaseAdapter;
+import com.cedarbarkgrooming.ui.gallery.SingleImageFragment;
 import com.cedarbarkgrooming.ui.home.HomeActivity;
 import com.cedarbarkgrooming.ui.home.HomePresenter;
 import com.cedarbarkgrooming.ui.reminders.CreateReminderActivity;
@@ -42,4 +44,7 @@ public interface Injector {
 
     void inject(GalleryActivity target);
 
+    void inject(GridBaseAdapter target);
+
+    void inject(SingleImageFragment target);
 }

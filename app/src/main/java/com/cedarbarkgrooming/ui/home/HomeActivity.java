@@ -25,6 +25,7 @@ import com.cedarbarkgrooming.model.maps.Distance;
 import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 import com.cedarbarkgrooming.sync.CedarBarkSyncAdapter;
 import com.cedarbarkgrooming.ui.BaseActivity;
+import com.cedarbarkgrooming.ui.gallery.GalleryActivity;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 
 import javax.inject.Inject;
@@ -145,7 +146,7 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     @OnClick(R.id.button_description)
     public void onViewGalleryClicked() {
-        mHomePresenter.onViewImageGalleryClick();
+        startActivity(new Intent(this, GalleryActivity.class));
     }
 
     @OnClick(R.id.layout_reminders)
