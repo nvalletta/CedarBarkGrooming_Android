@@ -175,7 +175,6 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     private void checkLocationAccess() {
         if (hasLocationAccess()) {
-            //todo: start sync adapter service
             CedarBarkSyncAdapter.initialize(this);
         } else {
             askUserForLocationPermission();

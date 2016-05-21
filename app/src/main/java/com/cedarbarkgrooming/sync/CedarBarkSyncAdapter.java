@@ -1,5 +1,6 @@
 package com.cedarbarkgrooming.sync;
 
+import android.Manifest.permission;
 import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.AbstractThreadedSyncAdapter;
@@ -8,12 +9,14 @@ import android.content.ContentResolver;
 import android.content.Context;
 import android.content.SyncRequest;
 import android.content.SyncResult;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.cedarbarkgrooming.R;
@@ -23,6 +26,8 @@ import com.cedarbarkgrooming.model.maps.Leg;
 import com.cedarbarkgrooming.model.maps.MapsResponse;
 import com.cedarbarkgrooming.model.maps.Route;
 import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
+
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -35,7 +40,7 @@ import static com.cedarbarkgrooming.module.ObjectGraph.getInjector;
 public class CedarBarkSyncAdapter extends AbstractThreadedSyncAdapter {
 
     // 60 seconds * 60 = 1 hour
-    public static final int SYNC_INTERVAL = 60*60;
+    public static final int SYNC_INTERVAL = 60 * 60;
     public static final int SYNC_FLEXTIME = SYNC_INTERVAL / 3;
 
     @Inject
@@ -81,14 +86,42 @@ public class CedarBarkSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void discoverTimeToReachCedarBark() {
         try {
-            LocationManager lm = (LocationManager) getContext().getSystemService(Context.LOCATION_SERVICE);
-            Location currentUserLocation = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (null !=currentUserLocation) {
+            Location currentUserLocation = getLastKnownLocation();
+            if (null != currentUserLocation) {
                 sendDistanceRequest(currentUserLocation);
             }
         } catch (SecurityException ex) {
             Log.e("CedarBarkSyncAdapter", "Error: couldn't calculate distance: " + ex.getMessage());
         }
+    }
+
+    /**
+     * Asks any and all providers for the user's last known location to find the best match.
+     * http://stackoverflow.com/questions/20438627/getlastknownlocation-returns-null
+     * @return the user's last known location, or null if we don't have permission or can't find one.
+     */
+    private Location getLastKnownLocation() {
+        Context context = getContext();
+        if (null == context) return null;
+
+        LocationManager locationManager = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
+        List<String> providers = locationManager.getProviders(true);
+        Location bestLocation = null;
+
+        if (ActivityCompat.checkSelfPermission(context, permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
+                ActivityCompat.checkSelfPermission(context, permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            return null;
+        }
+        for (String provider : providers) {
+            Location location = locationManager.getLastKnownLocation(provider);
+            if (location == null) {
+                continue;
+            }
+            if (bestLocation == null || location.getAccuracy() < bestLocation.getAccuracy()) {
+                bestLocation = location;
+            }
+        }
+        return bestLocation;
     }
 
     private void sendWeatherRequest() {

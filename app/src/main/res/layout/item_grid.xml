@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.cedarbarkgrooming.ui.gallery.SquareImageView
+    <com.cedarbarkgrooming.ui.custom.SquareImageView
         android:id="@+id/image_square"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

@@ -11,7 +11,7 @@
         <EditText
             android:id="@+id/edittext_title"
             android:layout_width="match_parent"
-            android:layout_height="60dp"
+            android:layout_height="@dimen/edittext_height"
             android:layout_margin="@dimen/text_margin"
             android:hint="(Enter the purpose of your reminder here)"/>
 

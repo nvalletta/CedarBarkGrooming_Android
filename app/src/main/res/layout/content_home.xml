@@ -18,7 +18,7 @@
             android:layout_marginTop="@dimen/text_margin"
             android:layout_marginStart="@dimen/text_margin"
             android:layout_marginEnd="@dimen/text_margin"
-            android:layout_marginBottom="0dp"
+            android:layout_marginBottom="@dimen/none"
             android:orientation="vertical">
             <TextView
                 android:id="@+id/text_weather"
@@ -37,7 +37,7 @@
                 android:layout_height="wrap_content"
                 android:text="@string/text_intro"
                 android:paddingTop="@dimen/text_margin_half"
-                android:paddingBottom="0dp"/>
+                android:paddingBottom="@dimen/none"/>
         </LinearLayout>
 
         <ImageView
@@ -50,8 +50,8 @@
         <com.cedarbarkgrooming.ui.custom.DescriptionGroup
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="0dp"
-            android:paddingTop="0dp"
+            android:layout_marginTop="@dimen/none"
+            android:paddingTop="@dimen/none"
             app:description="@string/description_text"
             app:actionText="@string/text_view_image_gallery" />
 

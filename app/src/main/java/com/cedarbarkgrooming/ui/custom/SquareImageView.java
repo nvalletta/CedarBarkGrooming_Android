@@ -1,4 +1,4 @@
-package com.cedarbarkgrooming.ui.gallery;
+package com.cedarbarkgrooming.ui.custom;
 
 import android.content.Context;
 import android.util.AttributeSet;
