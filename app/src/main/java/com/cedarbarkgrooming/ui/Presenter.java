@@ -41,6 +41,7 @@ public abstract class Presenter<V extends PresentedView> {
 
             Intent intent = new Intent();
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds);
+            intent.setPackage(context.getPackageName());
             intent.setAction(AppWidgetManager.ACTION_APPWIDGET_UPDATE);
             context.sendBroadcast(intent);
         }

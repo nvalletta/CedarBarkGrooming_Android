@@ -25,4 +25,5 @@
     <string name="text_distance">You\'re only %s away!</string>
     <string name="text_weather">It\'s %s degrees in Cedar City.</string>
     <string name="sync_account_type">currentDistanceFromCedarBarkGrooming</string>
+    <string name="text_before_and_anfter">Before and After Photos</string>
 </resources>

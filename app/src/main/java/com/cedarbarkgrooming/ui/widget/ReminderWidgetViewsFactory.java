@@ -73,6 +73,6 @@ public class ReminderWidgetViewsFactory implements RemoteViewsFactory {
 
     @Override
     public boolean hasStableIds() {
-        return true;
+        return false;
     }
 }
