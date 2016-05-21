@@ -9,4 +9,5 @@
     <dimen name="thumbnail_size">100dp</dimen>
     <dimen name="text_spacing_small">4dp</dimen>
     <dimen name="text_title_size">18sp</dimen>
+    <dimen name="none">0dp</dimen>
 </resources>

@@ -36,6 +36,8 @@
         <activity
             android:name=".ui.reminders.CreateReminderActivity"
             android:label="@string/text_add_reminder" />
+        <activity android:name=".ui.gallery.GalleryActivity"
+            android:label="@string/text_before_and_anfter"/>
         <provider
             android:authorities="@string/content_provider_authority"
             android:name=".data.reminders.ReminderContentProvider"
