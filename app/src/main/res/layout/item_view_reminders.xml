@@ -10,6 +10,7 @@
     android:background="?attr/selectableItemBackground">
 
     <ImageView
+        android:contentDescription="@string/content_a_cute_dog_freshly_groomed_by_christine_at_cedar_bark_grooming"
         android:layout_width="@dimen/thumbnail_size"
         android:layout_height="@dimen/thumbnail_size"
         android:src="@drawable/cutecustomer2"/>
@@ -19,7 +20,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical"
         android:text="@string/text_reminders"
-        android:paddingLeft="@dimen/text_margin"
-        android:paddingStart="@dimen/text_margin" />
+        android:paddingStart="@dimen/text_margin"
+        android:paddingEnd="@dimen/none"/>
 
 </LinearLayout>

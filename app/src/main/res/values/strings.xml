@@ -26,4 +26,9 @@
     <string name="text_weather">It\'s %s degrees in Cedar City.</string>
     <string name="sync_account_type">currentDistanceFromCedarBarkGrooming</string>
     <string name="text_before_and_anfter">Before and After Photos</string>
+    <string name="hint_enter_the_purpose_of_your_reminder_here">(Enter the purpose of your reminder here)</string>
+    <string name="content_a_lovely_picture_of_cedar_bark_grooming">A lovely picture of Cedar Bark Grooming</string>
+    <string name="content_full_sized_picture_of_selected_before_or_after_photo">Full sized picture of selected before or after photo</string>
+    <string name="content_square_thumbnail_image">A square thumbnail image</string>
+    <string name="content_a_cute_dog_freshly_groomed_by_christine_at_cedar_bark_grooming">A cute dog, freshly groomed by Christine at Cedar Bark Grooming</string>
 </resources>

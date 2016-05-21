@@ -5,6 +5,7 @@
 
     <com.cedarbarkgrooming.ui.custom.SquareImageView
         android:id="@+id/image_square"
+        android:contentDescription="@string/content_square_thumbnail_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:scaleType="centerCrop"/>
