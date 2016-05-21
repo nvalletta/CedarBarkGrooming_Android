@@ -33,6 +33,7 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
+import icepick.State;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.BehaviorSubject;
@@ -43,6 +44,7 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     private static final Uri CEDAR_BARK_URI = Uri.parse("https://www.google.com/maps/place/298+N+900+W,+Cedar+City,+UT+84721/@37.6825876,-113.0769967,17z/data=!3m1!4b1!4m5!3m4!1s0x80b56198c2942025:0xaec69677c68e45f0!8m2!3d37.6825876!4d-113.074808");
     private static final int LOADER_ID = 0x01;
+    private static final String KEY_PERMISSION_DENIED = "booleanPermissionDenied";
 
     private static final int LOCATION_REQUEST = 1337;
     private static final String[] LOCATION_PERMISSIONS = {
@@ -68,11 +70,17 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     Subscription mWeatherSubscription;
 
+    @State
+    boolean mDeniedLocationRequest = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
         ButterKnife.bind(this);
+        if (null != savedInstanceState) {
+            mDeniedLocationRequest = savedInstanceState.getBoolean(KEY_PERMISSION_DENIED, false);
+        }
         mHomePresenter.setPresentedView(this);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -84,6 +92,12 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
         watchForDistanceUpdates();
         watchForWeatherUpdates();
         syncData();
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        outState.putBoolean(KEY_PERMISSION_DENIED, mDeniedLocationRequest);
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -174,7 +188,9 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
     }
 
     private void checkLocationAccess() {
-        if (hasLocationAccess()) {
+        // If we already have location access, or if we've been denied that permission,
+        // don't ask again - just initialize our sync adapter.
+        if (hasLocationAccess() || mDeniedLocationRequest) {
             CedarBarkSyncAdapter.initialize(this);
         } else {
             askUserForLocationPermission();
@@ -191,6 +207,11 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        for (int i : grantResults) {
+            if (i == PackageManager.PERMISSION_DENIED) {
+                mDeniedLocationRequest = true;
+            }
+        }
         syncData();
     }
 
