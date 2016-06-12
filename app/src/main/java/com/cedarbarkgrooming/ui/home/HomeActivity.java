@@ -33,7 +33,6 @@ import javax.inject.Inject;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import icepick.State;
 import rx.Subscription;
 import rx.android.schedulers.AndroidSchedulers;
 import rx.subjects.BehaviorSubject;
@@ -70,7 +69,6 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     Subscription mWeatherSubscription;
 
-    @State
     boolean mDeniedLocationRequest = false;
 
     @Override
