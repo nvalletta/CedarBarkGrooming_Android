@@ -14,8 +14,6 @@ import android.support.v4.content.ContextCompat;
 import android.support.v4.content.Loader;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
@@ -26,7 +24,6 @@ import com.cedarbarkgrooming.model.weather.CedarBarkGroomingWeather;
 import com.cedarbarkgrooming.sync.CedarBarkSyncAdapter;
 import com.cedarbarkgrooming.ui.BaseActivity;
 import com.cedarbarkgrooming.ui.gallery.GalleryActivity;
-import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 
 import javax.inject.Inject;
 
@@ -134,18 +131,6 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
         getInjector().inject(this);
     }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_home, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        return id == R.id.action_settings || super.onOptionsItemSelected(item);
-    }
-
     @OnClick(R.id.fab_navigate)
     public void onNavigateClicked() {
         if (CedarBarkGroomingApplication.isAppInstalled("com.google.android.apps.maps")) {
@@ -163,7 +148,8 @@ public class HomeActivity extends BaseActivity implements HomeView, LoaderManage
 
     @OnClick(R.id.layout_reminders)
     public void onManageRemindersClicked() {
-        startActivity(new Intent(this, RemindersActivity.class));
+        //todo: in the future we'll be replacing these reminders with Google Calendar Reminders
+//        startActivity(new Intent(this, RemindersActivity.class));
     }
 
     @Override

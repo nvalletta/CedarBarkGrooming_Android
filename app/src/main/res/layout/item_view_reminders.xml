@@ -5,9 +5,7 @@
     android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="@dimen/text_margin"
-    android:clickable="true"
-    android:background="?attr/selectableItemBackground">
+    android:layout_margin="@dimen/text_margin">
 
     <ImageView
         android:contentDescription="@string/content_a_cute_dog_freshly_groomed_by_christine_at_cedar_bark_grooming"

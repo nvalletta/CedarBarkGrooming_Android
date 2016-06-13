@@ -12,8 +12,6 @@ import com.cedarbarkgrooming.ui.reminders.ReminderAdapter;
 import com.cedarbarkgrooming.ui.reminders.ReminderItem;
 import com.cedarbarkgrooming.ui.reminders.RemindersActivity;
 import com.cedarbarkgrooming.ui.reminders.RemindersPresenter;
-import com.cedarbarkgrooming.ui.widget.ReminderWidgetViewsFactory;
-import com.cedarbarkgrooming.ui.widget.WidgetService;
 
 /**
  * Created by Nora on 5/7/2016.
@@ -37,10 +35,6 @@ public interface Injector {
     void inject(HomePresenter target);
 
     void inject(CedarBarkSyncAdapter target);
-
-    void inject(ReminderWidgetViewsFactory target);
-
-    void inject(WidgetService target);
 
     void inject(GalleryActivity target);
 

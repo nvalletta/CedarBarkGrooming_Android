@@ -46,7 +46,6 @@ public class CreateReminderPresenter extends Presenter<PresentedView> {
             try {
                 mPresentedView.getViewContext().getContentResolver().insert(ReminderContentProvider.CONTENT_URI, values);
                 mReminders.add(new Reminder(title, date));
-                notifyRemoteViews();
             } catch(Exception e) {
                 mPresentedView.showError(ERROR_ADDING_REMINDER);
             }
